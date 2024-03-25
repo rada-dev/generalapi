@@ -5,6 +5,10 @@ import threading
 class Root(object):
 
     def __init__(self):
+        event = threading.Event()
+        event.set()
+        hostname = "localhost", 12340
+        self.host = host.Host(self, hostname, event)
         self.__p = 1
         self.v = 2
 
@@ -27,7 +31,4 @@ class Root(object):
 
 if __name__ == '__main__':
     r = Root()
-    e = threading.Event()
-    e.set()
-    h = "localhost", 12340
-    h = host.Host(r, h, e)
+
