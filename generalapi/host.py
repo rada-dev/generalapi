@@ -25,13 +25,13 @@ class Host(object):
         return self.threading_event.is_set()
 
     def accept(self):
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(self.hostname)
         self.sock.listen(self.MAX_CLIENTS)  # listen for incoming connections
         self.sock.settimeout(self.TIMEOUT_ACCEPT)
         while self.running:
             try:
                 conn, hostname = self.sock.accept()
-                conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 t = threading.Thread(target=self.recv, args=(conn,))
                 self.threads_conn[conn] = t
                 t.start()
@@ -51,7 +51,10 @@ class Host(object):
                     pickled_msg = conn.recv(recv_len)
                     command, args, kwargs = pickle.loads(pickled_msg)
                     method = getattr(self.root, command)
-                    ret = method(args, kwargs)
+                    if callable(method):
+                        ret = method(*args, **kwargs)
+                    else:   # object not callable, accessing variable
+                        ret = method
                     pickled_ret = pickle.dumps(ret)
                     ret_len_bytes = common.int_to_bytes(len(pickled_ret))
                     conn.send(ret_len_bytes)

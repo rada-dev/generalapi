@@ -25,7 +25,7 @@ class Client(object):
     def running(self):
         return self.threading_event.is_set()
 
-    def exec_(self, command, args, kwargs):
+    def exec_(self, command, *args, **kwargs):
         pickled_cmd = pickle.dumps((command, args, kwargs))
         cmd_len = common.int_to_bytes(len(pickled_cmd))
         self.sock.send(cmd_len)
