@@ -44,13 +44,18 @@ class Host(object):
 
     def recv(self, conn):
         while self.running:
-            recv_len = common.int_from_bytes(conn.recv(self.MSGLEN_NBYTES))  # receive packet
-            pickled_msg = conn.recv(recv_len)
-            command, args, kwargs = pickle.loads(pickled_msg)
-            method = getattr(self.root, command)
-            ret = method(args, kwargs)
-            pickled_ret = pickle.dumps(ret)
-            ret_len_bytes = common.int_to_bytes(len(pickled_ret))
-            conn.send(ret_len_bytes)
-            conn.send(pickled_ret)
+            try:
+                recv_len_bytes = conn.recv(self.MSGLEN_NBYTES)
+                if recv_len_bytes:
+                    recv_len = common.int_from_bytes(recv_len_bytes)  # receive packet
+                    pickled_msg = conn.recv(recv_len)
+                    command, args, kwargs = pickle.loads(pickled_msg)
+                    method = getattr(self.root, command)
+                    ret = method(args, kwargs)
+                    pickled_ret = pickle.dumps(ret)
+                    ret_len_bytes = common.int_to_bytes(len(pickled_ret))
+                    conn.send(ret_len_bytes)
+                    conn.send(pickled_ret)
+            except socket.timeout:
+                continue
         self.threads_conn.pop(conn)
