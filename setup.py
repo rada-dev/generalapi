@@ -1,12 +1,14 @@
 from setuptools import setup, find_packages
-from pathlib import Path
+import os
+
+SCRIPT_FOLDER = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_install_requires() -> list:
+def get_install_requires():
     """Returns requirements.txt parsed to a list"""
-    fname = Path(__file__).parent / 'requirements.txt'
+    fname = os.path.join(SCRIPT_FOLDER, 'requirements.txt')
     targets = []
-    if fname.exists():
+    if os.path.isfile(fname):
         with open(fname, 'r') as f:
             targets = f.read().splitlines()
     return targets
