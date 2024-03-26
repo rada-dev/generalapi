@@ -114,7 +114,7 @@ Create SSL keyfile and certfile
 
         def __init__(self):
             event = threading.Event()
-            self.ssl_host = SSLHost(self.ip, self.port, self, event, keyfile, certfile)
+            self.ssl_host = SSLHost(self.ip, self.port, self, event, self.keyfile, self.certfile)
             self.ssl_host.start()
 
             self.__foo = "__foo variable"
