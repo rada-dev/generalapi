@@ -23,7 +23,7 @@ Various sockets may be used:
         def __init__(self):
             event = threading.Event()
             ip, port = "localhost", 12340
-            self.host = host.Host(ip, port, self, event)
+            self.host = Host(ip, port, self, event)
             self.host.start()
 
             self.__foo = "__foo variable"
@@ -115,7 +115,7 @@ Create SSL keyfile and certfile
 
         def __init__(self):
             event = threading.Event()
-            self.ssl_host = host.SSLHost(self.ip, self.port, self, event, keyfile, certfile)
+            self.ssl_host = SSLHost(self.ip, self.port, self, event, keyfile, certfile)
             self.ssl_host.start()
 
             self.__foo = "__foo variable"
@@ -201,7 +201,7 @@ Create SSL keyfile and certfile
 
         def __init__(self):
             event = threading.Event()
-            self.ssl_host = host.UDSHost(self.uds_path, self, event)
+            self.ssl_host = UDSHost(self.uds_path, self, event)
             self.ssl_host.start()
 
             self.__foo = "__foo variable"
