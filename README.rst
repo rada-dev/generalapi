@@ -1,6 +1,14 @@
 Socket communication interface to create custom API
 ==========================================================
 
+Installation:
+-------------
+
+.. code::
+
+    python setup.py sdist
+    pip install sdist/generalapi-*.tar.gz
+
 Various sockets may be used:
 ----------------------------
 
