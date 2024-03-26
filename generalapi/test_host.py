@@ -17,22 +17,19 @@ class MyApplication(object):
         self.ssl_host = host.SSLHost(ip, port, self, event, keyfile, certfile)
         self.ssl_host.start()
 
-        self.__p = 1
-        self.v = 2
+        self.__foo = "__foo variable"
+        self.bar = "bar variable"
+        self.my_tuple = (1, 2, 3)
 
     @property
-    def p(self):
-        return self.__p
+    def foo(self):
+        return self.__foo
 
-    def a(self):
-        print "a called"
-        return "a"
+    def baz(self):
+        print "baz called"
+        return "baz called"
 
-    def b(self):
-        print "b called"
-        return "b"
-
-    def s(self, *args):
+    def sum(self, *args):
         print "sum called", args
         return sum(args)
 
