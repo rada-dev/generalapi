@@ -26,11 +26,11 @@ class MyApplication(object):
         return self.__foo
 
     def baz(self):
-        print "baz called"
+        print("baz called")
         return "baz called"
 
     def sum(self, *args):
-        print "sum called", args
+        print("sum called", args)
         return sum(args)
 
 

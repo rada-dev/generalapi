@@ -34,11 +34,11 @@ class MyAPI(Client):
 if __name__ == '__main__':
 
     api = MyAPI()
-    print api.foo
-    print api.bar
-    print api.my_tuple
-    print api.baz()
-    print api.sum(3.14, 2.71)
+    print(api.foo)
+    print(api.bar)
+    print(api.my_tuple)
+    print(api.baz())
+    print(api.sum(3.14, 2.71))
     api.close()
 
     # ip, port = "localhost", 12341
@@ -46,10 +46,10 @@ if __name__ == '__main__':
     # certfile = os.path.join("test_cert", "certfile.crt")
     # c_ssl = client.SSLClient(ip, port, keyfile, certfile)
     # c_ssl.connect()
-    # print c_ssl.exec_("a")
-    # print c_ssl.exec_("b")
-    # print c_ssl.exec_("v")
+    # print(c_ssl.exec_("a")
+    # print(c_ssl.exec_("b")
+    # print(c_ssl.exec_("v")
     # time.sleep(10)
-    # print c_ssl.exec_("p")
-    # print c_ssl.exec_("s", 4, 5)
+    # print(c_ssl.exec_("p")
+    # print(c_ssl.exec_("s", 4, 5)
     # c_ssl.close()

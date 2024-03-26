@@ -35,11 +35,11 @@ Various sockets may be used:
             return self.__foo
 
         def baz(self):
-            print "baz called"
+            print("baz called")
             return "baz called"
 
         def sum(self, *args):
-            print "sum called", args
+            print("sum called", args)
             return sum(args)
 
 
@@ -82,13 +82,12 @@ Various sockets may be used:
     if __name__ == '__main__':
 
         api = MyAPI()
-        print api.foo
-        print api.bar
-        print api.my_tuple
-        print api.baz()
-        print api.sum(3.14, 2.71)
+        print(api.foo)
+        print(api.bar)
+        print(api.my_tuple)
+        print(api.baz())
+        print(api.sum(3.14, 2.71))
         api.close()
-
 
 2. SSL socket (encrypted) example:
 ----------------------------------
@@ -127,17 +126,16 @@ Create SSL keyfile and certfile
             return self.__foo
 
         def baz(self):
-            print "baz called"
+            print("baz called")
             return "baz called"
 
         def sum(self, *args):
-            print "sum called", args
+            print("sum called", args)
             return sum(args)
 
 
     if __name__ == '__main__':
         r = MyApplication()
-
 
 .. code::
 
@@ -178,11 +176,11 @@ Create SSL keyfile and certfile
     if __name__ == '__main__':
 
         api = MyAPI()
-        print api.foo
-        print api.bar
-        print api.my_tuple
-        print api.baz()
-        print api.sum(3.14, 2.71)
+        print(api.foo)
+        print(api.bar)
+        print(api.my_tuple)
+        print(api.baz())
+        print(api.sum(3.14, 2.71))
         api.close()
 
 3. UDS (unix domain socket) example:
@@ -213,17 +211,16 @@ Create SSL keyfile and certfile
             return self.__foo
 
         def baz(self):
-            print "baz called"
+            print("baz called")
             return "baz called"
 
         def sum(self, *args):
-            print "sum called", args
+            print("sum called", args)
             return sum(args)
 
 
     if __name__ == '__main__':
         r = MyApplication()
-
 
 .. code::
 
@@ -261,9 +258,9 @@ Create SSL keyfile and certfile
     if __name__ == '__main__':
 
         api = MyAPI()
-        print api.foo
-        print api.bar
-        print api.my_tuple
-        print api.baz()
-        print api.sum(3.14, 2.71)
+        print(api.foo)
+        print(api.bar)
+        print(api.my_tuple)
+        print(api.baz())
+        print(api.sum(3.14, 2.71))
         api.close()
