@@ -1,4 +1,4 @@
-Simple socket communication interface to create custom API
+Socket communication interface to create custom API
 ==========================================================
 
 Various sockets may be used:
@@ -9,7 +9,7 @@ Various sockets may be used:
 3. UDS (unix domain socket)
 
 1. Plain socket (no encryption) example:
-----------------------------
+----------------------------------------
 
 .. code::
 
@@ -91,7 +91,7 @@ Various sockets may be used:
 
 
 2. SSL socket (encrypted) example:
-----------------------------
+----------------------------------
 
 Create SSL keyfile and certfile
 
@@ -186,7 +186,7 @@ Create SSL keyfile and certfile
         api.close()
 
 3. UDS (unix domain socket) example:
-----------------------------
+------------------------------------
 
 .. code::
 
