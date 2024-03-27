@@ -206,7 +206,7 @@ Create SSL keyfile and certfile
         def __init__(self):
             event = threading.Event()
             uds_path = "/path/to/uds/socket"
-            app_root = self
+            app_root = self     # self.something will be called by client
             self.ssl_host = UDSHost(uds_path, app_root, event)
             self.ssl_host.start()
 
