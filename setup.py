@@ -21,5 +21,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     license='GPLv3',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
 )

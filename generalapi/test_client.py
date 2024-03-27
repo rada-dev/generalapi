@@ -1,20 +1,17 @@
-import time
-
-from generalapi.client import Client
-import os
+# my_api.py
+from generalapi.client import UDSClient
 
 
-class MyAPI(Client):
-
-    ip, port = "localhost", 12340
+class MyAPI(UDSClient):
 
     def __init__(self):
-        super(MyAPI, self).__init__(self.ip, self.port)
+        uds_path = "test_uds"
+        super(MyAPI, self).__init__(uds_path)
         self.connect()
 
     @property
     def foo(self):
-        return self.exec_("foo")
+        return self.exec_("foo")  # exec MyApplication.foo
 
     @property
     def bar(self):
@@ -32,7 +29,6 @@ class MyAPI(Client):
 
 
 if __name__ == '__main__':
-
     api = MyAPI()
     print(api.foo)
     print(api.bar)
@@ -40,16 +36,3 @@ if __name__ == '__main__':
     print(api.baz())
     print(api.sum(3.14, 2.71))
     api.close()
-
-    # ip, port = "localhost", 12341
-    # keyfile = os.path.join("test_cert", "keyfile.key")
-    # certfile = os.path.join("test_cert", "certfile.crt")
-    # c_ssl = client.SSLClient(ip, port, keyfile, certfile)
-    # c_ssl.connect()
-    # print(c_ssl.exec_("a")
-    # print(c_ssl.exec_("b")
-    # print(c_ssl.exec_("v")
-    # time.sleep(10)
-    # print(c_ssl.exec_("p")
-    # print(c_ssl.exec_("s", 4, 5)
-    # c_ssl.close()

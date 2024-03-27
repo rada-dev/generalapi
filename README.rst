@@ -32,7 +32,8 @@ Various sockets may be used:
         def __init__(self):
             event = threading.Event()
             ip, port = "localhost", 12340
-            self.host = Host(ip, port, self, event)
+            app_root = self     # self.something will be called by client
+            self.host = Host(ip, port, app_root, event)
             self.host.start()
 
             self.__foo = "__foo variable"
@@ -63,15 +64,14 @@ Various sockets may be used:
 
     class MyAPI(Client):
 
-        ip, port = "localhost", 12340
-
         def __init__(self):
-            super(MyAPI, self).__init__(self.ip, self.port)
+            ip, port = "localhost", 12340
+            super(MyAPI, self).__init__(ip, port)
             self.connect()
 
         @property
         def foo(self):
-            return self.exec_("foo")
+            return self.exec_("foo")    # exec MyApplication.foo
 
         @property
         def bar(self):
@@ -117,13 +117,13 @@ Create SSL keyfile and certfile
 
     class MyApplication(object):
 
-        keyfile = os.path.join("test_cert", "keyfile.key")
-        certfile = os.path.join("test_cert", "certfile.crt")
-        ip, port = "localhost", 12340
-
         def __init__(self):
             event = threading.Event()
-            self.ssl_host = SSLHost(self.ip, self.port, self, event, self.keyfile, self.certfile)
+            keyfile = os.path.join("test_cert", "keyfile.key")
+            certfile = os.path.join("test_cert", "certfile.crt")
+            ip, port = "localhost", 12340
+            app_root = self     # self.something will be called by client
+            self.ssl_host = SSLHost(ip, port, app_root, event, keyfile, certfile)
             self.ssl_host.start()
 
             self.__foo = "__foo variable"
@@ -155,17 +155,16 @@ Create SSL keyfile and certfile
 
     class MyAPI(SSLClient):
 
-        keyfile = os.path.join("test_cert", "keyfile.key")
-        certfile = os.path.join("test_cert", "certfile.crt")
-        ip, port = "localhost", 12340
-
         def __init__(self):
-            super(MyAPI, self).__init__(self.ip, self.port, self.keyfile, self.certfile)
+            keyfile = os.path.join("test_cert", "keyfile.key")
+            certfile = os.path.join("test_cert", "certfile.crt")
+            ip, port = "localhost", 12340
+            super(MyAPI, self).__init__(ip, port, keyfile, certfile)
             self.connect()
 
         @property
         def foo(self):
-            return self.exec_("foo")
+            return self.exec_("foo")    # exec MyApplication.foo
 
         @property
         def bar(self):
@@ -204,11 +203,11 @@ Create SSL keyfile and certfile
 
     class MyApplication(object):
 
-        uds_path = "/path/to/uds/socket"
-
         def __init__(self):
             event = threading.Event()
-            self.ssl_host = UDSHost(self.uds_path, self, event)
+            uds_path = "/path/to/uds/socket"
+            app_root = self
+            self.ssl_host = UDSHost(uds_path, app_root, event)
             self.ssl_host.start()
 
             self.__foo = "__foo variable"
@@ -239,15 +238,14 @@ Create SSL keyfile and certfile
 
     class MyAPI(UDSClient):
 
-        uds_path = "/path/to/uds/socket"
-
         def __init__(self):
-            super(MyAPI, self).__init__(self.uds_path)
+            uds_path = "/path/to/uds/socket"
+            super(MyAPI, self).__init__(uds_path)
             self.connect()
 
         @property
         def foo(self):
-            return self.exec_("foo")
+            return self.exec_("foo")    # exec MyApplication.foo
 
         @property
         def bar(self):

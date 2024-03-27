@@ -1,3 +1,5 @@
+import os
+
 from sock_host import SockHost
 import socket
 import ssl
@@ -26,4 +28,6 @@ class UDSHost(SockHost):
 
     def __init__(self, hostname, root, threading_event):
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        if os.path.exists(hostname):
+            os.unlink(hostname)
         super(UDSHost, self).__init__(sock, hostname, root, threading_event)
