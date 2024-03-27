@@ -205,7 +205,7 @@ Create SSL keyfile and certfile
 
         def __init__(self):
             event = threading.Event()
-            uds_path = "/path/to/uds/socket"
+            uds_path = "/tmp/stream.sock"
             app_root = self     # self.something will be called by client
             self.ssl_host = UDSHost(uds_path, app_root, event)
             self.ssl_host.start()
@@ -239,7 +239,7 @@ Create SSL keyfile and certfile
     class MyAPI(UDSClient):
 
         def __init__(self):
-            uds_path = "/path/to/uds/socket"
+            uds_path = "/tmp/stream.sock"
             super(MyAPI, self).__init__(uds_path)
             self.connect()
 
