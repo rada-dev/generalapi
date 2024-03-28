@@ -28,8 +28,6 @@ class MyApplication(QMainWindow):
         return self.__foo
 
     def baz(self):
-        print("baz called")
-        print self.thread()
         return "baz called"
 
     def sum(self, *args):

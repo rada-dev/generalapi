@@ -10,12 +10,46 @@ Installation:
     python setup.py sdist
     pip install sdist/generalapi-*.tar.gz
 
-Various sockets may be used:
-----------------------------
+Features:
+---------
+
+- host and client interfaces with use of:
 
 1. plain (no encryption)
+
+.. code::
+
+    from generalapi.host import Host
+    from generalapi.client import Client
+
 2. SSL (with encryption)
+
+.. code::
+
+    from generalapi.host import SSLHost
+    from generalapi.client import SSLClient
+
 3. UDS (unix domain socket)
+
+.. code::
+
+    from generalapi.host import UDSHost
+    from generalapi.client import UDSClient
+
+4. PyQt integration
+
+    if you used the client to execute host commands which, for instance, create and handle another QThreads, you may experience the host command not being executed
+
+    in such cases PyQt compatible host is needed, with this, the commands will be executed in the application main thread, not in the thread which does socket.recv()
+
+.. code::
+
+    # host variants with QThread
+    from generalapi.host import QHost   # host which employs QThread (plain socket)
+    from generalapi.host import QSSLHost   # host which employs QThread (SSL socket)
+    from generalapi.host import QUDSHost   # host which employs QThread (UDS socket)
+    # client side will be the same
+    from generalapi.client import Client
 
 1. Plain socket (no encryption) example:
 ----------------------------------------
