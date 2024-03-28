@@ -1,15 +1,18 @@
 # my_application.py
-from generalapi.host import UDSHost
-import threading
+from generalapi.host import QHost
+from generalapi.qthread_event import QThreadEvent
+from PyQt5.QtWidgets import QApplication, QMainWindow
+import sys
 
 
-class MyApplication(object):
+class MyApplication(QMainWindow):
 
     def __init__(self):
-        event = threading.Event()
-        uds_path = "test_uds"
+        super(MyApplication, self).__init__()
+        event = QThreadEvent(self)
+        ip, port = "localhost", 12340
         app_root = self
-        self.ssl_host = UDSHost(uds_path, app_root, event)
+        self.ssl_host = QHost(self, ip, port, app_root, event)
         self.ssl_host.start()
 
         self.__foo = "__foo variable"
@@ -30,4 +33,6 @@ class MyApplication(object):
 
 
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
     r = MyApplication()
+    app.exec_()

@@ -5,7 +5,7 @@ import common
 
 class SockClient(object):
 
-    TIMEOUT = 0.5
+    TIMEOUT = None
 
     MSGLEN_NBYTES = 4
 

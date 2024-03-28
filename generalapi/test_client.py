@@ -1,12 +1,12 @@
 # my_api.py
-from generalapi.client import UDSClient
+from generalapi.client import Client
 
 
-class MyAPI(UDSClient):
+class MyAPI(Client):
 
     def __init__(self):
-        uds_path = "test_uds"
-        super(MyAPI, self).__init__(uds_path)
+        ip, port = "localhost", 12340
+        super(MyAPI, self).__init__(ip, port)
         self.connect()
 
     @property
