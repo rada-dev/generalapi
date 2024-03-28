@@ -18,7 +18,9 @@ class MyApplication(QMainWindow):
         self.__foo = "__foo variable"
         self.bar = "bar variable"
         self.my_tuple = (1, 2, 3)
-        print "main", self.thread()
+
+    def test(self):
+        print self.thread()
 
     @property
     def foo(self):
@@ -37,4 +39,5 @@ class MyApplication(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     r = MyApplication()
+    r.show()
     app.exec_()

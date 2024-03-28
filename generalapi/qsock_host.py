@@ -55,7 +55,6 @@ class QSockHost(QObject):
                 conn, hostname = self.sock.accept()
                 conn.settimeout(self.TIMEOUT)
                 self.sig_new_connection.emit(conn)
-                print "accept", self.thread()
 
             # exception handling while communicating
             except socket.timeout:
@@ -77,7 +76,6 @@ class QSockHost(QObject):
         self.threads_conn.pop(conn)
 
     def recv(self, conn):
-        print "recv", self.thread()
         keep_running = True
         while self.running and keep_running:
             try:
