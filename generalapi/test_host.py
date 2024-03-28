@@ -18,6 +18,7 @@ class MyApplication(QMainWindow):
         self.__foo = "__foo variable"
         self.bar = "bar variable"
         self.my_tuple = (1, 2, 3)
+        print "main", self.thread()
 
     @property
     def foo(self):
@@ -25,6 +26,7 @@ class MyApplication(QMainWindow):
 
     def baz(self):
         print("baz called")
+        print self.thread()
         return "baz called"
 
     def sum(self, *args):
