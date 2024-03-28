@@ -18,9 +18,10 @@ class MyApplication(QMainWindow):
         self.__foo = "__foo variable"
         self.bar = "bar variable"
         self.my_tuple = (1, 2, 3)
+        self.main_thread = self.thread()
 
     def test(self):
-        print self.thread()
+        return self.thread() == self.main_thread    # test if host executes the command in main thread
 
     @property
     def foo(self):

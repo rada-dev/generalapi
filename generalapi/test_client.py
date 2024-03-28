@@ -27,6 +27,9 @@ class MyAPI(Client):
     def sum(self, x, y):
         return self.exec_("sum", x, y)
 
+    def test(self):
+        return self.exec_("test")
+
 
 if __name__ == '__main__':
     api = MyAPI()
@@ -35,4 +38,5 @@ if __name__ == '__main__':
     print(api.my_tuple)
     print(api.baz())
     print(api.sum(3.14, 2.71))
+    print(api.test())
     api.close()
