@@ -1,5 +1,5 @@
 Python socket communication interface to create custom API
-==========================================================
+----------------------------------------------------------
 
 Installation:
 -------------
