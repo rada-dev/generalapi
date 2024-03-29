@@ -1,4 +1,6 @@
 # my_api.py
+import time
+
 from generalapi.client import Client
 
 
@@ -36,6 +38,7 @@ if __name__ == '__main__':
     print(api.foo)
     print(api.bar)
     print(api.my_tuple)
+    time.sleep(10)
     print(api.baz())
     print(api.sum(3.14, 2.71))
     print(api.test())

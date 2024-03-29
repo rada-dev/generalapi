@@ -26,10 +26,8 @@ class QSockHost(QObject):
         self.thread_accept = QThread(self)
         self.thread_accept.run = self.accept
         self.threads_conn = {}
-        self.executor = Executor(self, self.root)
-        self.executor.moveToThread(self.thread())
         self.sig_new_connection.connect(self.slot_new_connection)
-        self.sig_exec.connect(self.executor.run)
+        self.sig_exec.connect(self.slot_exec)
 
     def start(self):
         self.threading_event.set()
@@ -62,15 +60,15 @@ class QSockHost(QObject):
                 continue
         self.sock.close()
 
+    @pyqtSlot(socket.socket)
     def slot_new_connection(self, conn):
         t = QThread(self)
-        t.moveToThread(self.main_thread)
         t.run = partial(self.recv, conn)
         t.finished.connect(partial(self.slot_stop_connection, conn))
         self.threads_conn[conn] = t
         t.start()
 
-    @pyqtSlot()
+    @pyqtSlot(socket.socket)
     def slot_stop_connection(self, conn):
         conn.close()
         self.threads_conn.pop(conn)
@@ -91,14 +89,8 @@ class QSockHost(QObject):
             except (socket.timeout, ssl.SSLError):
                 continue
 
-
-class Executor(QObject):
-
-    def __init__(self, parent, root):
-        super(Executor, self).__init__(parent)
-        self.root = root
-
-    def run(self, conn, command, args, kwargs):    # exec in main thread
+    @pyqtSlot(socket.socket, str, tuple, dict)
+    def slot_exec(self, conn, command, args, kwargs):    # exec in main thread
         method = getattr(self.root, command)
         if callable(method):
             ret = method(*args, **kwargs)
@@ -108,4 +100,3 @@ class Executor(QObject):
         ret_len_bytes = common.int_to_bytes(len(pickled_ret))
         conn.send(ret_len_bytes)
         conn.send(pickled_ret)
-
