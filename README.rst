@@ -1,4 +1,4 @@
-Socket communication interface to create custom API
+Python socket communication interface to create custom API
 ==========================================================
 
 Installation:
@@ -15,14 +15,14 @@ Features:
 
 - host and client interfaces with use of:
 
-1. plain (no encryption)
+1. plain socket (no encryption)
 
 .. code::
 
     from generalapi.host import Host
     from generalapi.client import Client
 
-2. SSL (with encryption)
+2. SSL socket (with encryption)
 
 .. code::
 
