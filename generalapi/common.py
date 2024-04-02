@@ -1,27 +1,30 @@
+import numpy as np
 import struct
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 import configparser
+import base64
 import io
 
 
 MSGDTYPE_PICKLE = chr(0)
 MSGDTYPE_CONFIGPARSER = chr(1)
+MSGDTYPE_NUMPY = chr(2)
 
 MSGLEN_NBYTES = 4
 
 
 def pack(data):
-    try:
+    # if isinstance(data, np.ndarray):
+    #     return MSGDTYPE_NUMPY, numpy_arr_to_buff(data)
+    if isinstance(data, configparser.ConfigParser):
+        b = io.StringIO()
+        data.write(b)
+        return MSGDTYPE_CONFIGPARSER, b.getvalue()
+    else:
         return MSGDTYPE_PICKLE, pickle.dumps(data)
-    except TypeError:   # cannot pickle
-        if isinstance(data, configparser.ConfigParser):
-            b = io.StringIO()
-            data.write(b)
-            return MSGDTYPE_CONFIGPARSER, b.getvalue()
-        raise AssertionError("unsupported object to pickle")
 
 
 def pack_and_send(conn, data):
@@ -46,6 +49,26 @@ def unpack(dtype, msg):
         c = configparser.ConfigParser()
         c.read_string(msg.decode("utf-8"))
         return c
+    # elif dtype == MSGDTYPE_NUMPY:
+    #     return numpy_msg_to_arr(msg)
+    else:
+        raise AssertionError("unsupported message dtype")
+
+
+def numpy_arr_to_buff(arr):
+    buff = io.BytesIO()
+    np.save(buff, arr)
+    buff.seek(0)  # Reset buffer position to the beginning
+    buff_data = buff.getvalue()
+    return buff_data
+
+
+def numpy_msg_to_arr(msg):
+    buff = io.BytesIO()
+    buff.write(msg)
+    buff.seek(0)  # Reset buffer position to the beginning
+    array = np.load(buff)
+    return array
 
 
 def int_from_bytes(b):

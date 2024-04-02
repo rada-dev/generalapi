@@ -50,7 +50,7 @@ class MyApplication(QPushButton):
             self.cp.add_section(section)
             for key, value in options.items():
                 self.cp.set(section, key, value)
-        self.arr = numpy.zeros((10, 10))
+        self.arr = numpy.eye(10)
 
     @pyqtSlot()
     def mutex_unlock(self):
