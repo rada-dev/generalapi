@@ -22,11 +22,6 @@ class SockClient(object):
         self.sock.close()
 
     def exec_(self, command, *args, **kwargs):
-        pickled_cmd = pickle.dumps((command, args, kwargs))
-        cmd_len = common.int_to_bytes(len(pickled_cmd))
-        self.sock.send(cmd_len)
-        self.sock.send(pickled_cmd)
-        recv_len = common.int_from_bytes(self.sock.recv(self.MSGLEN_NBYTES))  # receive packet
-        pickled_ret = self.sock.recv(recv_len)
-        ret = pickle.loads(pickled_ret)
-        return ret
+        common.pack_and_send(self.sock, (command, args, kwargs))
+        recv_len_bytes = self.sock.recv(self.MSGLEN_NBYTES)
+        return common.recv_and_unpack(self.sock, recv_len_bytes)

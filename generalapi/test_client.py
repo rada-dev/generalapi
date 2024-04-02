@@ -32,14 +32,27 @@ class MyAPI(Client):
     def test(self):
         return self.exec_("test")
 
+    def test_thread(self):
+        return self.exec_("test_thread")
+
+    @property
+    def cp(self):
+        return self.exec_("cp")
+
+    @property
+    def arr(self):
+        return self.exec_("arr")
+
 
 if __name__ == '__main__':
     api = MyAPI()
     print(api.foo)
     print(api.bar)
     print(api.my_tuple)
-    time.sleep(10)
     print(api.baz())
     print(api.sum(3.14, 2.71))
-    print(api.test())
+    print(api.cp.get("Section2", "key3"))
+    print(api.arr)
+    # print(api.test())
+    # print(api.test_thread())
     api.close()
