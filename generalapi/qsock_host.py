@@ -1,3 +1,4 @@
+import Queue as queue
 import ssl
 import socket
 import common
@@ -94,7 +95,6 @@ class QSockHost(QObject):
                 recv_len_bytes = conn.recv(self.MSGLEN_NBYTES)
                 if recv_len_bytes:
                     command, args, kwargs = common.recv_and_unpack(conn, recv_len_bytes)
-                    print conn, command, args, kwargs
                     self.sig_exec.emit(conn, command, args, kwargs)
                 else:
                     # client disconnected
@@ -107,7 +107,6 @@ class QSockHost(QObject):
         while self.running and keep_running:
             try:
                 resp = self.q_response.get()
-                print resp
                 data = []
                 while resp != "end":
                     data.append(resp)
@@ -129,3 +128,11 @@ class QSockHost(QObject):
     @pyqtSlot(socket.socket, object)
     def slot_exec_response(self, conn, ret):
         common.pack_and_send(conn, ret)
+
+    def clear_queue(self):
+        while True:
+            try:
+                self.q_response.get_nowait()
+            except queue.Empty:
+                return
+
