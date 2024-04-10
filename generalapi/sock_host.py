@@ -2,7 +2,6 @@ import ssl
 import threading
 import socket
 import common
-import cPickle as pickle
 
 
 class SockHost(object):
