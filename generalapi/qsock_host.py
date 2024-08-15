@@ -5,6 +5,7 @@ import common
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from functools import partial
 from multiprocessing import Queue
+import traceback
 
 
 class QSockHost(QObject):
@@ -30,6 +31,7 @@ class QSockHost(QObject):
         self.threads_exec = {}
         self.threads_response = {}
         self.q_response = Queue()
+        self.buffer = list()
         self.sig_new_connection.connect(self.slot_new_connection)
         self.sig_exec.connect(self.slot_exec)
         self.sig_exec_response.connect(self.slot_exec_response)
@@ -102,21 +104,27 @@ class QSockHost(QObject):
             except (socket.timeout, ssl.SSLError):
                 continue
             except socket.error:
+                print "SOCKET ERROR"
+                print traceback.print_exc()
                 # client disconnected (forcibly)
                 keep_running = False
 
     def respond_images_from_queue(self, conn):
         keep_running = True
         while self.running and keep_running:
-            try:
+            # try:
+            del self.buffer[:]
+            resp = self.q_response.get()
+            # print "RESP", resp, self.buffer
+            while resp != "end":
+                # print "DATA", self.buffer
+                self.buffer.append(resp)
+                # print "DATA APPEND", self.buffer
                 resp = self.q_response.get()
-                data = []
-                while resp != "end":
-                    data.append(resp)
-                    resp = self.q_response.get()
-                self.sig_exec_response.emit(conn, data)
-            except (socket.timeout, ssl.SSLError):
-                continue
+                # print "RESP", resp, self.buffer
+            self.sig_exec_response.emit(conn, self.buffer[:])   # copy the buffer so the slot gets the data untouched
+            # except (socket.timeout, ssl.SSLError):
+            #     continue
 
     @pyqtSlot(socket.socket, str, tuple, dict)
     def slot_exec(self, conn, command, args, kwargs):    # exec in main thread
