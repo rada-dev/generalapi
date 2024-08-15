@@ -12,6 +12,61 @@ import configparser
 import sys
 
 
+class AcqThread(QThread):
+
+    error = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super(AcqThread, self).__init__(parent)
+        self.cond = QWaitCondition()
+        self.mutex = QMutex()
+        self.__finish_signal = None
+        self.__acq_method = None
+
+    def init(self):
+        try:
+            self.started.disconnect()
+        except TypeError:
+            pass
+        try:
+            self.finished.disconnect()
+        except TypeError:
+            pass
+        if self.__finish_signal is not None:
+            try:
+                self.__finish_signal.disconnect(self.cond.wakeAll)
+            except TypeError:
+                pass
+        self.__finish_signal = None
+        self.__acq_method = None
+
+    def start(self, priority=None):
+        if self.__finish_signal is not None and self.__acq_method is not None:
+            self.__finish_signal.connect(self.cond.wakeAll)
+            super(AcqThread, self).start()
+            print "acq thread started",
+        else:
+            print "Finish signal or acq method not set!"
+            self.error.emit("Finish signal or acq method not set!")
+
+    def setFinishSignal(self, signal):
+        self.__finish_signal = signal
+
+    def setAcqMethod(self, method):
+        self.__acq_method = method
+
+    def run(self):
+        print "acq thread calling acq method", self.__acq_method
+        self.__acq_method()
+        print "acq thread acq method called"
+        self.mutex.lock()
+        try:
+            self.cond.wait(self.mutex)
+        finally:
+            self.mutex.unlock()
+        print "acq thread finished"
+
+
 class MyApplication(QPushButton):
 
     sig = pyqtSignal()
@@ -28,10 +83,11 @@ class MyApplication(QPushButton):
         self.bar = "bar variable"
         self.my_tuple = (1, 2, 3)
         self.main_thread = self.thread()
-        self.t = QThread(self)
-        self.t.run = self.mutex_unlock
-        self.condition = QWaitCondition()
-        self.mutex = QMutex()
+        self.acq_thread = AcqThread(self)
+        self.acq_thread.setAcqMethod(self.acq_method)
+        self.acq_thread.setFinishSignal(self.sig)
+        self.unlock_thread = QThread(self)
+        self.unlock_thread.run = self.mutex_unlock
         # self.sig.connect(self.mutex_unlock)
         self.clicked.connect(self.test)
         self.cp = configparser.ConfigParser()
@@ -56,16 +112,21 @@ class MyApplication(QPushButton):
     def mutex_unlock(self):
         print "mutex unlock"
         time.sleep(5)
-        self.condition.wakeAll()
+        self.sig.emit()
         print "unlocked"
+
+    @pyqtSlot()
+    def acq_method(self):
+        time.sleep(0.1)
 
     @pyqtSlot()
     def test(self):
         print self.thread() == self.main_thread
+        self.acq_thread.start()
+        self.unlock_thread.start()
         return self.thread() == self.main_thread    # test if host executes the command in main thread
 
     def test_thread(self):
-        self.t.start()
         self.mutex.lock()
         print "waiting"
         try:

@@ -50,6 +50,9 @@ class SockHost(object):
             except socket.timeout:
                 # print("socket accept timeout", file=sys.stderr)
                 continue
+            except socket.error:
+                # client disconnected (forcibly)
+                break
         self.sock.close()
 
     def recv(self, conn):

@@ -53,6 +53,6 @@ if __name__ == '__main__':
     print(api.sum(3.14, 2.71))
     print(api.cp.get("Section2", "key3"))
     print(api.arr.shape)
-    # print(api.test())
+    print(api.test())
     # print(api.test_thread())
     api.close()
