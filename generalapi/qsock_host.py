@@ -101,6 +101,9 @@ class QSockHost(QObject):
                     keep_running = False
             except (socket.timeout, ssl.SSLError):
                 continue
+            except socket.error:
+                # client disconnected (forcibly)
+                keep_running = False
 
     def respond_images_from_queue(self, conn):
         keep_running = True
