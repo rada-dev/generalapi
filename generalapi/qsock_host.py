@@ -67,7 +67,7 @@ class QSockHost(QObject):
                 self.sig_new_connection.emit(conn)
 
             # exception handling while communicating
-            except socket.timeout:
+            except (socket.timeout, socket.error, ssl.SSLError):
                 # print("socket accept timeout", file=sys.stderr)
                 continue
         self.sock.close()
@@ -105,7 +105,7 @@ class QSockHost(QObject):
                 continue
             except socket.error:
                 print "SOCKET ERROR"
-                print traceback.print_exc()
+                print traceback.format_exc()
                 # client disconnected (forcibly)
                 keep_running = False
 
