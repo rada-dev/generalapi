@@ -71,7 +71,7 @@ class QSockHost(QObject):
             except (socket.timeout, socket.error, ssl.SSLError):
                 # print("socket accept timeout", file=sys.stderr)
                 continue
-        self.sock.close()
+        # self.sock.close()
 
     @pyqtSlot(socket.socket)
     def slot_new_connection(self, conn):
