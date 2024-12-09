@@ -30,9 +30,9 @@ def pack(data):
 def pack_and_send(conn, data):
     dtype_bytes, msg_bytes = pack(data)
     len_bytes = int_to_bytes(len(msg_bytes))
-    conn.send(len_bytes)
-    conn.send(dtype_bytes)
-    conn.send(msg_bytes)
+    conn.sendall(len_bytes+dtype_bytes+msg_bytes)
+    # conn.sendall(dtype_bytes)
+    # conn.sendall(msg_bytes)
 
 
 def recv_and_unpack(conn, recv_len_bytes):
