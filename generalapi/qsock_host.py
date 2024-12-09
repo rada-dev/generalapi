@@ -6,6 +6,7 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from functools import partial
 from multiprocessing import Queue
 import traceback
+import time
 
 
 class QSockHost(QObject):
@@ -121,7 +122,8 @@ class QSockHost(QObject):
                 self.buffer.append(resp)
                 # print "DATA APPEND", self.buffer
                 resp = self.q_response.get()
-                # print "RESP", resp, self.buffer
+                # print "RESP", resp, self.buffer, resp != "end"
+            time.sleep(0.1)
             self.sig_exec_response.emit(conn, self.buffer[:])   # copy the buffer so the slot gets the data untouched
             # except (socket.timeout, ssl.SSLError):
             #     continue
@@ -130,11 +132,10 @@ class QSockHost(QObject):
     def slot_exec(self, conn, command, args, kwargs):    # exec in main thread
         method = getattr(self.root, command)
         if callable(method):
-            ret = method(*args, **kwargs)
+            ret = method(*args, **kwargs)   # acq method, list of images through queue
         else:  # object not callable, accessing variable
             ret = method
-        # if not respond_from_queue:  # respond either here directly or by waiting for queue data
-        self.sig_exec_response.emit(conn, ret)
+            self.sig_exec_response.emit(conn, ret)
 
     @pyqtSlot(socket.socket, object)
     def slot_exec_response(self, conn, ret):
