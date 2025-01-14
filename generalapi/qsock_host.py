@@ -132,7 +132,11 @@ class QSockHost(QObject):
     def slot_exec(self, conn, command, args, kwargs):    # exec in main thread
         method = getattr(self.root, command)
         if callable(method):
-            ret = method(*args, **kwargs)   # acq method, list of images through queue
+            if "Acquisition" in method:     # callable SnapAcquisition/DarkAcquisition, etc.
+                ret = method(*args, **kwargs)   # acq method, list of images through queue
+            else:
+                ret = method(*args, **kwargs)   # callable method, administrative_xls_path(), etc.
+                self.sig_exec_response.emit(conn, ret)  # return value
         else:  # object not callable, accessing variable
             ret = method
             self.sig_exec_response.emit(conn, ret)
