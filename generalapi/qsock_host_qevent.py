@@ -121,7 +121,7 @@ class QSockHostQEventPoster(QObject):
             conn = event.conn
             obj = self.buffers[conn][:]
             common.pack_and_send(conn, obj)
-            del self.buffer[:]
+            del self.buffers[conn][:]
             return True
         else:
             return super(QSockHostQEventPoster, self).event(event)
