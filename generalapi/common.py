@@ -82,16 +82,18 @@ def int_to_bytes(n):
 class PutToBufferEvent(QEvent):
     EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
 
-    def __init__(self, obj):
+    def __init__(self, conn, obj):
         QEvent.__init__(self, PutToBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
+        self.conn = conn
         self.obj = obj
 
 
 class EndBufferEvent(QEvent):
     EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
 
-    def __init__(self):
+    def __init__(self, conn):
         QEvent.__init__(self, EndBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
+        self.conn = conn
 
 
 if __name__ == '__main__':
