@@ -5,7 +5,7 @@ try:
 except ImportError:
     import pickle
 import configparser
-import base64
+from PyQt5.QtCore import QEvent
 import io
 
 
@@ -77,6 +77,21 @@ def int_from_bytes(b):
 
 def int_to_bytes(n):
     return struct.pack('<I', n)
+
+
+class PutToBufferEvent(QEvent):
+    EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
+
+    def __init__(self, obj):
+        QEvent.__init__(self, PutToBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
+        self.obj = obj
+
+
+class EndBufferEvent(QEvent):
+    EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
+
+    def __init__(self):
+        QEvent.__init__(self, EndBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
 
 
 if __name__ == '__main__':

@@ -1,25 +1,10 @@
 import ssl
 import socket
 import common
-from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QEvent
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from functools import partial
 import traceback
 from collections import defaultdict
-
-
-class PutToBufferEvent(QEvent):
-    EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
-
-    def __init__(self, obj):
-        QEvent.__init__(self, PutToBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
-        self.obj = obj
-
-
-class EndBufferEvent(QEvent):
-    EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
-
-    def __init__(self):
-        QEvent.__init__(self, EndBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
 
 
 class QSockHostQEventPoster(QObject):
@@ -112,12 +97,12 @@ class QSockHostQEventPoster(QObject):
                 keep_running = False
 
     def event(self, event):
-        if event.type() == PutToBufferEvent.EVENT_TYPE:     # put object to buffer
+        if event.type() == common.PutToBufferEvent.EVENT_TYPE:     # put object to buffer
             conn = event.conn
             obj = event.obj
             self.buffers[conn].append(obj)
             return True
-        elif event.type() == EndBufferEvent.EVENT_TYPE:     # buffer end, send buffer to client
+        elif event.type() == common.EndBufferEvent.EVENT_TYPE:     # buffer end, send buffer to client
             conn = event.conn
             obj = self.buffers[conn][:]
             common.pack_and_send(conn, obj)
