@@ -1,11 +1,10 @@
-import Queue as queue
 import ssl
 import socket
 import common
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QEvent
 from functools import partial
-from multiprocessing import Queue
 import traceback
+from collections import defaultdict
 
 
 class PutToBufferEvent(QEvent):
@@ -42,7 +41,7 @@ class QSockHostQEventPoster(QObject):
         self.thread_accept = QThread(self)
         self.thread_accept.run = self.accept
         self.threads_exec = {}
-        self.buffers = list()
+        self.buffers = defaultdict(list)
         self.sig_new_connection.connect(self.slot_new_connection)
         self.sig_exec.connect(self.slot_exec)
 
@@ -114,13 +113,13 @@ class QSockHostQEventPoster(QObject):
 
     def event(self, event):
         if event.type() == PutToBufferEvent.EVENT_TYPE:     # put object to buffer
-            obj = event.obj
             conn = event.conn
+            obj = event.obj
             self.buffers[conn].append(obj)
             return True
         elif event.type() == EndBufferEvent.EVENT_TYPE:     # buffer end, send buffer to client
-            obj = self.buffer[:]
             conn = event.conn
+            obj = self.buffers[conn][:]
             common.pack_and_send(conn, obj)
             del self.buffer[:]
             return True
@@ -129,9 +128,12 @@ class QSockHostQEventPoster(QObject):
 
     @pyqtSlot(socket.socket, str, tuple, dict)
     def slot_exec(self, conn, command, args, kwargs):    # exec in main thread
-        method = getattr(self.root, command)
-        if callable(method):
-            ret = method(*args, **kwargs)   # callable method, administrative_xls_path(), etc.
-        else:  # object not callable, accessing variable
-            ret = method
-        common.pack_and_send(conn, ret)
+        try:
+            method = getattr(self.root, command)
+            if callable(method):
+                ret = method(*args, **kwargs)   # callable method, administrative_xls_path(), etc.
+            else:  # object not callable, accessing variable
+                ret = method
+            common.pack_and_send(conn, ret)
+        except AttributeError:
+            common.pack_and_send(conn, "unknown command")
