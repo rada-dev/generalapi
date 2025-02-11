@@ -4,6 +4,7 @@ import os
 
 from sock_host import SockHost
 from qsock_host import QSockHost
+from qsock_host_qevent import QSockHostQEventPoster
 
 
 class Host(SockHost):
@@ -60,3 +61,11 @@ class QUDSHost(QSockHost):
         if os.path.exists(hostname):
             os.unlink(hostname)
         QSockHost.__init__(self, parent, sock, hostname, root, qthread_event)
+
+
+class QHostWithQEventPoster(QSockHostQEventPoster):
+
+    def __init__(self, parent, ip, port, root, qthread_event):
+        hostname = ip, port
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        QSockHostQEventPoster.__init__(self, parent, sock, hostname, root, qthread_event)
