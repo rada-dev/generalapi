@@ -96,6 +96,17 @@ class EndBufferEvent(QEvent):
         self.conn = conn
 
 
+class ApiExecEvent(QEvent):
+    EVENT_TYPE = QEvent.Type(QEvent.registerEventType())
+
+    def __init__(self, conn, command, args, kwargs):
+        QEvent.__init__(self, EndBufferEvent.EVENT_TYPE)  # Explicit QEvent constructor
+        self.conn = conn
+        self.command = command
+        self.args = args
+        self.kwargs = kwargs
+
+
 if __name__ == '__main__':
     # x = np.eye(50)
     # b = pickle.dumps(x)

@@ -1,7 +1,7 @@
 import ssl
 import socket
 import common
-from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QCoreApplication
 from functools import partial
 import traceback
 from collections import defaultdict
@@ -84,6 +84,8 @@ class QSockHostQEventPoster(QObject):
                 recv_len_bytes = conn.recv(self.MSGLEN_NBYTES)
                 if recv_len_bytes:
                     command, args, kwargs = common.recv_and_unpack(conn, recv_len_bytes)
+                    # event = common.ApiExecEvent(conn, command, args, kwargs)
+                    # QCoreApplication.postEvent(self.root, event)
                     self.sig_exec.emit(conn, command, args, kwargs)
                 else:
                     # client disconnected
@@ -97,14 +99,16 @@ class QSockHostQEventPoster(QObject):
                 keep_running = False
 
     def event(self, event):
-        if event.type() == common.PutToBufferEvent.EVENT_TYPE:     # put object to buffer
+        if isinstance(event, common.PutToBufferEvent):     # put object to buffer
             conn = event.conn
             obj = event.obj
+            print "sock host put to buffer event", event, obj, conn
             self.buffers[conn].append(obj)
             return True
-        elif event.type() == common.EndBufferEvent.EVENT_TYPE:     # buffer end, send buffer to client
+        elif isinstance(event, common.EndBufferEvent):     # buffer end, send buffer to client
             conn = event.conn
             obj = self.buffers[conn][:]
+            print "sock host end buffer event", event, obj, conn
             common.pack_and_send(conn, obj)
             del self.buffers[conn][:]
             return True
