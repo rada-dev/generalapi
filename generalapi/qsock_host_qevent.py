@@ -1,6 +1,5 @@
 import ssl
 import socket
-import sys
 
 import common
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
@@ -30,7 +29,7 @@ class QSockHostQEventPoster(QObject):
         self.thread_accept.run = self.accept
         self.threads_exec = {}
         self.buffers = defaultdict(list)
-        # self.sig_new_connection.connect(self.slot_new_connection)
+        self.sig_new_connection.connect(self.slot_new_connection)
         self.sig_exec.connect(self.slot_exec)
 
     def start(self):
@@ -63,14 +62,15 @@ class QSockHostQEventPoster(QObject):
                 if self.sock in readable:
                     conn, hostname = self.sock.accept()
                     conn.settimeout(self.TIMEOUT)
-                    # new connection
-                    t_exec = QThread(self)
-                    t_exec.run = partial(self.recv, conn)
-                    self.threads_exec[conn] = t_exec
-                    # t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
-                    t_exec.start()
 
-                    # self.sig_new_connection.emit(conn)
+                    # # new connection
+                    # t_exec = QThread(self)
+                    # t_exec.run = partial(self.recv, conn)
+                    # self.threads_exec[conn] = t_exec
+                    # # t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
+                    # t_exec.start()
+
+                    self.sig_new_connection.emit(conn)
 
             except (socket.error, ssl.SSLError):
                 continue  # Ignore errors and keep running
@@ -78,13 +78,13 @@ class QSockHostQEventPoster(QObject):
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
-    # @pyqtSlot(socket.socket)
-    # def slot_new_connection(self, conn):
-    #     t_exec = QThread(self)
-    #     t_exec.run = partial(self.recv, conn)
-    #     self.threads_exec[conn] = t_exec
-    #     # t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
-    #     t_exec.start()
+    @pyqtSlot(socket.socket)
+    def slot_new_connection(self, conn):
+        t_exec = QThread(self)
+        t_exec.run = partial(self.recv, conn)
+        self.threads_exec[conn] = t_exec
+        # t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
+        t_exec.start()
 
     def recv(self, conn):
         while self.running:
