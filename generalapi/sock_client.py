@@ -1,5 +1,4 @@
 import socket
-import pickle
 import common
 
 
@@ -19,6 +18,7 @@ class SockClient(object):
         self.sock.connect(self.hostname)
 
     def close(self):
+        self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
     def exec_(self, command, *args, **kwargs):

@@ -75,6 +75,7 @@ class QSockHostQEventPoster(QObject):
             except (socket.error, ssl.SSLError):
                 continue  # Ignore errors and keep running
 
+        self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
     # @pyqtSlot(socket.socket)
@@ -111,6 +112,7 @@ class QSockHostQEventPoster(QObject):
 
         # stop connection
         try:
+            conn.shutdown(socket.SHUT_RDWR)
             conn.close()
         except Exception:
             pass  # Avoid exceptions if conn is already closed
