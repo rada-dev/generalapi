@@ -69,3 +69,19 @@ class QHostWithQEventPoster(QSockHostQEventPoster):
         hostname = ip, port
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         QSockHostQEventPoster.__init__(self, parent, sock, hostname, root, qthread_event)
+
+
+if __name__ == '__main__':
+    from PyQt5.QtWidgets import QApplication
+    import threading
+    import sys
+
+    class Root:
+
+        def a(self, *args, **kwargs):
+            return "a"
+
+    app = QApplication(sys.argv)
+    host = QHostWithQEventPoster(None, "localhost", 18813, Root(), threading.Event())
+    host.start()
+    app.exec_()

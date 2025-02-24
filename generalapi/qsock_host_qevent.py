@@ -1,9 +1,9 @@
 import ssl
 import socket
-import threading
+import sys
 
 import common
-from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QCoreApplication
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from functools import partial
 import traceback
 import select

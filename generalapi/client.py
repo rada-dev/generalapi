@@ -25,3 +25,9 @@ class UDSClient(SockClient):
     def __init__(self, hostname):
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         super(UDSClient, self).__init__(sock, hostname)
+
+
+if __name__ == '__main__':
+    c = Client("localhost", 18813)
+    c.connect()
+    print c.exec_("a", (), {})
