@@ -1,9 +1,12 @@
 import ssl
 import socket
+import threading
+
 import common
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QCoreApplication
 from functools import partial
 import traceback
+import select
 from collections import defaultdict
 
 
@@ -27,7 +30,7 @@ class QSockHostQEventPoster(QObject):
         self.thread_accept.run = self.accept
         self.threads_exec = {}
         self.buffers = defaultdict(list)
-        self.sig_new_connection.connect(self.slot_new_connection)
+        # self.sig_new_connection.connect(self.slot_new_connection)
         self.sig_exec.connect(self.slot_exec)
 
     def start(self):
@@ -54,49 +57,66 @@ class QSockHostQEventPoster(QObject):
         self.sock.settimeout(self.TIMEOUT)
         while self.running:
             try:
-                conn, hostname = self.sock.accept()
-                conn.settimeout(self.TIMEOUT)
-                self.sig_new_connection.emit(conn)
+                # Use select to check if a new connection is available
+                readable, _, _ = select.select([self.sock], [], [], self.TIMEOUT)
 
-            # exception handling while communicating
-            except (socket.timeout, socket.error, ssl.SSLError):
-                # print("socket accept timeout", file=sys.stderr)
-                continue
-        # self.sock.close()
+                if self.sock in readable:
+                    conn, hostname = self.sock.accept()
+                    conn.settimeout(self.TIMEOUT)
+                    # new connection
+                    t_exec = QThread(self)
+                    t_exec.run = partial(self.recv, conn)
+                    self.threads_exec[conn] = t_exec
+                    # t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
+                    t_exec.start()
 
-    @pyqtSlot(socket.socket)
-    def slot_new_connection(self, conn):
-        t_exec = QThread(self)
-        t_exec.run = partial(self.recv, conn)
-        self.threads_exec[conn] = t_exec
-        t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
-        t_exec.start()
+                    # self.sig_new_connection.emit(conn)
 
-    @pyqtSlot(socket.socket)
-    def slot_stop_connection(self, conn):
-        conn.close()
-        self.threads_exec.pop(conn)
+            except (socket.error, ssl.SSLError):
+                continue  # Ignore errors and keep running
+
+        self.sock.close()
+
+    # @pyqtSlot(socket.socket)
+    # def slot_new_connection(self, conn):
+    #     t_exec = QThread(self)
+    #     t_exec.run = partial(self.recv, conn)
+    #     self.threads_exec[conn] = t_exec
+    #     # t_exec.finished.connect(partial(self.slot_stop_connection, conn))   # stops both exec and response threads
+    #     t_exec.start()
 
     def recv(self, conn):
-        keep_running = True
-        while self.running and keep_running:
+        while self.running:
             try:
-                recv_len_bytes = conn.recv(self.MSGLEN_NBYTES)
-                if recv_len_bytes:
-                    command, args, kwargs = common.recv_and_unpack(conn, recv_len_bytes)
-                    # event = common.ApiExecEvent(conn, command, args, kwargs)
-                    # QCoreApplication.postEvent(self.root, event)
-                    self.sig_exec.emit(conn, command, args, kwargs)
-                else:
-                    # client disconnected
-                    keep_running = False
+                inputready, _, _ = select.select([conn], [], [], self.TIMEOUT)
+
+                if conn in inputready:
+                    recv_len_bytes = conn.recv(self.MSGLEN_NBYTES)
+
+                    if recv_len_bytes:
+                        command, args, kwargs = common.recv_and_unpack(conn, recv_len_bytes)
+                        self.sig_exec.emit(conn, command, args, kwargs)
+                    else:
+                        # Client disconnected gracefully
+                        print("Client disconnected")
+                        break  # Exit loop to handle cleanup
+
             except (socket.timeout, ssl.SSLError):
-                continue
+                continue  # Ignore and retry
+
             except socket.error:
-                print "SOCKET ERROR"
-                print traceback.format_exc()
-                # client disconnected (forcibly)
-                keep_running = False
+                print("SOCKET ERROR")
+                print(traceback.format_exc())
+                break  # Exit loop to handle cleanup
+
+        # stop connection
+        try:
+            conn.close()
+        except Exception:
+            pass  # Avoid exceptions if conn is already closed
+
+        self.threads_exec.pop(conn, None)  # Prevent KeyError
+        self.buffers.pop(conn, None)  # Prevent KeyError
 
     def event(self, event):
         if isinstance(event, common.PutToBufferEvent):     # put object to buffer
