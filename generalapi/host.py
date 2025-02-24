@@ -78,8 +78,11 @@ if __name__ == '__main__':
 
     class Root:
 
-        def a(self, *args, **kwargs):
+        def a(self):
             return "a"
+
+        def b(self, c, d):
+            return c + d
 
     app = QApplication(sys.argv)
     host = QHostWithQEventPoster(None, "localhost", 18813, Root(), threading.Event())

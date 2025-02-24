@@ -30,4 +30,5 @@ class UDSClient(SockClient):
 if __name__ == '__main__':
     c = Client("localhost", 18813)
     c.connect()
-    print c.exec_("a", (), {})
+    print c.exec_("a")
+    print c.exec_("b", 1, 2)
